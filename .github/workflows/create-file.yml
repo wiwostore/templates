@@ -8,9 +8,16 @@ on:
         required: true
         default: 'file.txt'
       filepath:
-        description: 'Đường dẫn folder chứa file (ví dụ: aplicas/ios)'
-        required: true
-        default: 'aplicas/ios'
+          description: 'Đường dẫn folder chứa file (chọn một trong các folder dưới đây hoặc nhập tay)'
+          required: true
+          default: 'aplicas/ios'
+          options:
+            - aplicas/ios
+            - aplicas/android
+            - randg/ba6ba
+            - randg/ba7ba
+            - randg/ha1ha
+            - weplcas
       filecontent:
         description: 'Nội dung file'
         required: true
