@@ -20,22 +20,39 @@ on:
         required: true
         default: 'File được tạo bởi GitHub Action'
 
+permissions:
+  contents: write
+
 jobs:
   create-file:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout repo (preserve credentials)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true   # <-- very important for git push
+          fetch-depth: 0
 
-      - name: Tạo file với nội dung
+      - name: Create file with content
         run: |
           mkdir -p "${{ github.event.inputs.filepath }}"
           echo "${{ github.event.inputs.filecontent }}" > "${{ github.event.inputs.filepath }}/${{ github.event.inputs.filename }}"
 
-      - name: Commit và push thay đổi
+      - name: Configure git
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit if changed
+        run: |
           git add "${{ github.event.inputs.filepath }}/${{ github.event.inputs.filename }}"
-          git commit -m "Tạo file ${{ github.event.inputs.filename }} tại ${{ github.event.inputs.filepath }} qua Action"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Tạo file ${{ github.event.inputs.filename }} tại ${{ github.event.inputs.filepath }} qua Action"
+          fi
+
+      - name: Push changes to main
+        run: |
+          # Push current HEAD to main (will use GITHUB_TOKEN because persist-credentials: true)
+          git push origin HEAD:main || (echo "Push failed — maybe branch protected or permission denied" && exit 1)
