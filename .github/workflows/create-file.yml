@@ -14,9 +14,6 @@ on:
           options:
             - aplicas/ios
             - aplicas/android
-            - randg/ba6ba
-            - randg/ba7ba
-            - randg/ha1ha
             - weplcas
       filecontent:
         description: 'Nội dung file'
